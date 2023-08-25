@@ -1,0 +1,19 @@
+.Container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+
+  .scroll {
+    overflow-y: scroll;
+  }
+
+.AppName {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
+
+.lineThrough {
+    text-decoration: line-through;
+}
