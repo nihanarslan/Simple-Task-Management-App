@@ -37,33 +37,33 @@ function KanbanBoard() {
       source.droppableId === destination.droppableId &&
       destination.index === source.index
     ) return;
-      
-    if (source.droppableId == "inprogress") {
+
+    if (source.droppableId === "inprogress") {
       const newList = [...progListItems];
       const [removedTask] = newList.splice(source.index, 1);
 
-      if(destination.droppableId == "inprogress"){
+      if(destination.droppableId === "inprogress"){
         newList.splice(destination.index, 0, removedTask);
         return setProgListItems(newList);
       }
 
       setProgListItems([...newList]);
-    } else if (source.droppableId == "done") {
+    } else if (source.droppableId === "done") {
       const newList = [...doneListItems];
       const [removedTask] = newList.splice(source.index, 1);
 
-      if(destination.droppableId == "done"){
-        
+      if(destination.droppableId === "done"){
+
         newList.splice(destination.index, 0, removedTask);
         return setDoneListItems(newList);
       }
 
       setDoneListItems([...newList]);
-    } else if (source.droppableId == "todo") {
+    } else if (source.droppableId === "todo") {
       const newList = [...toDoListItems];
       const [removedTask] = newList.splice(source.index, 1);
 
-      if(destination.droppableId == "todo"){
+      if(destination.droppableId === "todo"){
         newList.splice(destination.index, 0, removedTask);
         return setToDoListItems(newList);
       }
@@ -78,14 +78,14 @@ function KanbanBoard() {
     ]);
 
 
-    if (destination.droppableId == "inprogress") {
+    if (destination.droppableId === "inprogress") {
 
       const newList = Array.from(progListItems);
       newList.splice(destination.index, 0, task);
       setProgListItems([...newList]);
 
       // setProgListItems([{ ...task }, ...progListItems]);
-    } else if (destination.droppableId == "done") {
+    } else if (destination.droppableId === "done") {
 
       const newList = Array.from(doneListItems);
       newList.splice(destination.index, 0, task);
@@ -102,7 +102,7 @@ function KanbanBoard() {
   };
 
   function findItemById(id, array) {
-    return array.find((item) => item.id == id);
+    return array.find((item) => item.id === Number(id));
   }
 
   const addNewItem = () => {
