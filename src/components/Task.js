@@ -20,6 +20,7 @@ export default function Task(props) {
               backgroundColor: snapshot.isDragging ? "#1E88E5" : "#6C6C6C",
               margin: 5,
               textAlign: "left",
+              fontSize:20,
               color: "#E1E1E1"
             }}
           > 

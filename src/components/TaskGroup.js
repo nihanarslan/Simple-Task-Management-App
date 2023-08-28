@@ -8,7 +8,7 @@ import React from "react";
 export default function TaskGroup(props) {
   return (
     <div style={{ padding: 10 }}>
-      <Card style={{ width: "24rem", height: 500, background: "#121212"}}>
+      <Card style={{ width: "20rem", height: 400, background: "#121212"}}>
         <Card.Header style={{color: "#A5A5A5"}}>{props.title}</Card.Header>
 
         <div className="taskgroup">
