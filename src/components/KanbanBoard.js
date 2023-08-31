@@ -1,123 +1,100 @@
 import "../styles.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import TaskGroup from "./TaskGroup";
-
-let maxID=9;  //Max id for the predefined list
+import { db } from "../firebase";
+import {
+  query,
+  collection,
+  onSnapshot,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "@firebase/firestore";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 
 
 function KanbanBoard() {
   //Lists will be an array of objects in case other properties are added in the future.
-  const [toDoListItems, setToDoListItems] = useState([
-    { id: 1, title: "Add the finished project on Github" },
-    { id: 2, title: "Finish reading a book" },
-    { id: 3, title: "Clean the house" },
-    { id: 4, title: "Make a job application" },
-    { id: 5, title: "Buy ingredients from the market" },
-  ]);
-  const [progListItems, setProgListItems] = useState([
-    { id: 6, title: "Work on the project" },
-    { id: 7, title: "Take a shower" },
-  ]);
-  const [doneListItems, setDoneListItems] = useState([
-    { id: 8, title: "Go for a walk" },
-    { id: 9, title: "Finish the one work that never ends" },
-  ]);
+  const [toDoListItems, setToDoListItems] = useState([]);
+  const [progListItems, setProgListItems] = useState([]);
+  const [doneListItems, setDoneListItems] = useState([]);
 
-  
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const [input, setInput] = useState("");
+
+  //Create new Task
+  const createTask = async (e) => {
+    e.preventDefault(e);
+
+    if (input === null || input === "") return;
+
+    await addDoc(collection(db, "Tasks"), {
+      title: input,
+      state: "todo",
+    });
+    setInput("");
+    handleClose();
+  };
+
+  // Read Lists from Firebase
+  useEffect(() => {
+    const q = query(collection(db, "Tasks"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let todoArr = [];
+      let inProgArr = [];
+      let doneArr = [];
+      querySnapshot.forEach((doc) => {
+        if (doc.data().state === "todo")
+          todoArr.push({ ...doc.data(), id: doc.id });
+        else if (doc.data().state === "inprogress")
+          inProgArr.push({ ...doc.data(), id: doc.id });
+        else if (doc.data().state === "done")
+          doneArr.push({ ...doc.data(), id: doc.id });
+      });
+      setToDoListItems(todoArr);
+      setProgListItems(inProgArr);
+      setDoneListItems(doneArr);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  //Update Lists in Firebase
+  const update = async (id, destination) => {
+    await updateDoc(doc(db, "Tasks", id), {
+      state: destination,
+    });
+  };
 
   const handleDragEnd = (result) => {
-
     const { destination, source, draggableId } = result;
-
 
     if (!destination) return;
 
     if (
       source.droppableId === destination.droppableId &&
       destination.index === source.index
-    ) return;
+    )
+      return;
 
-    if (source.droppableId === "inprogress") {
-      const newList = [...progListItems];
-      const [removedTask] = newList.splice(source.index, 1);
-
-      if(destination.droppableId === "inprogress"){
-        newList.splice(destination.index, 0, removedTask);
-        return setProgListItems(newList);
-      }
-
-      setProgListItems([...newList]);
-    } else if (source.droppableId === "done") {
-      const newList = [...doneListItems];
-      const [removedTask] = newList.splice(source.index, 1);
-
-      if(destination.droppableId === "done"){
-
-        newList.splice(destination.index, 0, removedTask);
-        return setDoneListItems(newList);
-      }
-
-      setDoneListItems([...newList]);
-    } else if (source.droppableId === "todo") {
-      const newList = [...toDoListItems];
-      const [removedTask] = newList.splice(source.index, 1);
-
-      if(destination.droppableId === "todo"){
-        newList.splice(destination.index, 0, removedTask);
-        return setToDoListItems(newList);
-      }
-
-      setToDoListItems([...newList]);
-    }
-
-    const task = findItemById(draggableId, [
-      ...toDoListItems,
-      ...progListItems,
-      ...doneListItems,
-    ]);
-
-
-    if (destination.droppableId === "inprogress") {
-
-      const newList = Array.from(progListItems);
-      newList.splice(destination.index, 0, task);
-      setProgListItems([...newList]);
-
-      // setProgListItems([{ ...task }, ...progListItems]);
-    } else if (destination.droppableId === "done") {
-
-      const newList = Array.from(doneListItems);
-      newList.splice(destination.index, 0, task);
-      setDoneListItems([...newList]);
-      // setDoneListItems([{ ...task }, ...doneListItems]);
-    } else {
-
-      const newList = Array.from(toDoListItems);
-      newList.splice(destination.index, 0, task);
-      setToDoListItems([...newList]);
-      // setToDoListItems([{ ...task }, ...toDoListItems]);
-    }
-
+    update(draggableId, destination.droppableId);
   };
 
-  function findItemById(id, array) {
-    return array.find((item) => item.id === Number(id));
-  }
-
-  const addNewItem = () => {
-    const item = prompt("Add a task to TODO List");
-    maxID += 1;//ID will be set as max id number + 1. ID should be unique
-    setToDoListItems((prev) => [{ id: maxID, title: item }, ...prev]); 
-
-    console.log(toDoListItems);
+  //Delete Completed Tasks
+  const clearDoneTasks = async () => {
+    console.log(doneListItems);
+    const promises = doneListItems.map((docId) =>
+      deleteDoc(doc(db, "Tasks", docId.id))
+    );
+    await Promise.all(promises);
   };
-
-  const clearAll = () => {
-    const changedList = [];
-    setDoneListItems(changedList);
-  };
-
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
@@ -138,26 +115,55 @@ function KanbanBoard() {
           }}
         >
           <TaskGroup title={"TO DO"} tasks={toDoListItems} id={"todo"} />
-         
-          <button
+
+          <Button
+            variant="light"
             style={{
               backgroundImage: "url(/addIcon.png)",
               backgroundRepeat: "no-repeat",
               backgroundSize: "70px, 70px",
-              backgroundOrigin: "padding-box",
               backgroundPosition: "center",
               height: 50,
               width: 50,
               borderRadius: "70%",
-              display: "inline-block",
-              marginTop:10
+              border:"none",
+              marginTop: 10,
             }}
-            onClick={addNewItem}
-          ></button>
+            onClick={handleShow}
+          ></Button>
 
+          <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Add New Task</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    type="text"
+                    autoFocus
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={createTask}>
+                Add
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
 
-        <TaskGroup title={"IN PROGRESS"} tasks={progListItems} id={"inprogress"}/>
+        <TaskGroup
+          title={"IN PROGRESS"}
+          tasks={progListItems}
+          id={"inprogress"}
+        />
 
         <div
           style={{
@@ -169,7 +175,8 @@ function KanbanBoard() {
         >
           <TaskGroup title={"DONE"} tasks={doneListItems} id={"done"} />
 
-          <button
+          <Button
+            variant="light"
             style={{
               backgroundImage: "url(/deleteAll.png)",
               backgroundRepeat: "no-repeat",
@@ -178,12 +185,11 @@ function KanbanBoard() {
               height: 50,
               width: 50,
               borderRadius: "70%",
-              display: "inline-block",
-              marginTop:10
+              border:"none",
+              marginTop: 10,
             }}
-            onClick={clearAll}
-          ></button>
-
+            onClick={clearDoneTasks}
+          ></Button>
         </div>
       </div>
     </DragDropContext>
