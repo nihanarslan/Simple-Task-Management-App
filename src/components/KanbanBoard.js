@@ -16,8 +16,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 
-
-function KanbanBoard() {
+function KanbanBoard(props) {
   //Lists will be an array of objects in case other properties are added in the future.
   const [toDoListItems, setToDoListItems] = useState([]);
   const [progListItems, setProgListItems] = useState([]);
@@ -37,6 +36,7 @@ function KanbanBoard() {
     if (input === null || input === "") return;
 
     await addDoc(collection(db, "Tasks"), {
+      user: props.user.uid,
       title: input,
       state: "todo",
     });
@@ -52,12 +52,14 @@ function KanbanBoard() {
       let inProgArr = [];
       let doneArr = [];
       querySnapshot.forEach((doc) => {
-        if (doc.data().state === "todo")
-          todoArr.push({ ...doc.data(), id: doc.id });
-        else if (doc.data().state === "inprogress")
-          inProgArr.push({ ...doc.data(), id: doc.id });
-        else if (doc.data().state === "done")
-          doneArr.push({ ...doc.data(), id: doc.id });
+        if (doc.data().user === props.user.uid) {
+          if (doc.data().state === "todo")
+            todoArr.push({ ...doc.data(), id: doc.id });
+          else if (doc.data().state === "inprogress")
+            inProgArr.push({ ...doc.data(), id: doc.id });
+          else if (doc.data().state === "done")
+            doneArr.push({ ...doc.data(), id: doc.id });
+        }
       });
       setToDoListItems(todoArr);
       setProgListItems(inProgArr);
@@ -126,7 +128,7 @@ function KanbanBoard() {
               height: 50,
               width: 50,
               borderRadius: "70%",
-              border:"none",
+              border: "none",
               marginTop: 10,
             }}
             onClick={handleShow}
@@ -185,7 +187,7 @@ function KanbanBoard() {
               height: 50,
               width: 50,
               borderRadius: "70%",
-              border:"none",
+              border: "none",
               marginTop: 10,
             }}
             onClick={clearDoneTasks}
