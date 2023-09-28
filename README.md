@@ -1,3 +1,14 @@
+# Simple Task Management
+This project is a simple task management project that consists of three blocks todo, in progress and done.\
+This project has dragging feature to change the task state, and add button for new tasks and a delete button to remove all done tasks at once. \
+This project is connected to firebase and the user can sign-up/sign-in for personal usage
+
+![stmp_login](https://github.com/nihanarslan/Simple-Task-Management-App/assets/9341379/3e896d1c-c42d-4548-979d-aca4f64c9dbe)
+![stmp_signup](https://github.com/nihanarslan/Simple-Task-Management-App/assets/9341379/9a65d9d9-cd5b-4bc0-b35e-8bb1b8a8e5ee)
+![stmp](https://github.com/nihanarslan/Simple-Task-Management-App/assets/9341379/21d5835d-24ce-4614-a3a3-ff4af1f17a52)
+![stmp_addnewtask](https://github.com/nihanarslan/Simple-Task-Management-App/assets/9341379/04f04812-bc2f-49da-8cb9-cd1340e68fd2)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
