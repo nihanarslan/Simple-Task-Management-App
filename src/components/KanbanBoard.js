@@ -1,4 +1,3 @@
-import "../styles.css";
 import { useState, useEffect } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import TaskGroup from "./TaskGroup";
@@ -15,6 +14,7 @@ import {
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import "./KanbanBoard.css";
 
 function KanbanBoard(props) {
   //Lists will be an array of objects in case other properties are added in the future.
@@ -100,37 +100,13 @@ function KanbanBoard(props) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignContent: "start",
-          flexDirection: "row",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
+      <div className="dragdropcontext">
+        <div>
           <TaskGroup title={"TO DO"} tasks={toDoListItems} id={"todo"} />
 
           <Button
             variant="light"
-            style={{
-              backgroundImage: "url(/addIcon.png)",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "70px, 70px",
-              backgroundPosition: "center",
-              height: 50,
-              width: 50,
-              borderRadius: "70%",
-              border: "none",
-              marginTop: 10,
-            }}
+            className="button buttonAdd"
             onClick={handleShow}
           ></Button>
 
@@ -167,29 +143,12 @@ function KanbanBoard(props) {
           id={"inprogress"}
         />
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
+        <div>
           <TaskGroup title={"DONE"} tasks={doneListItems} id={"done"} />
 
           <Button
             variant="light"
-            style={{
-              backgroundImage: "url(/deleteAll.png)",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "60px, 60px",
-              backgroundPosition: "center",
-              height: 50,
-              width: 50,
-              borderRadius: "70%",
-              border: "none",
-              marginTop: 10,
-            }}
+            className="button buttonDelete"
             onClick={clearDoneTasks}
           ></Button>
         </div>
